@@ -9,6 +9,10 @@ cv2capture = CV2VideoCapture()
 cv2capture.activateCamera()
 threading.Thread(target = cv2capture.startStream, daemon=True,).start()
 
+@app.route("/")
+def home():
+    return "Server is ready and up"
+
 @app.route("/status")
 def status():
     return "ready"
