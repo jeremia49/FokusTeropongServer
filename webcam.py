@@ -13,7 +13,7 @@ class CV2VideoCapture():
 
     def startStream(self):
         while True:
-            time.sleep(5)
+            time.sleep(1)
             ret, frame = self.cam.read()
             self.currentimage = cv2.imencode('.jpg', frame)[1].tobytes()
         return False
