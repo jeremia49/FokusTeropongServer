@@ -1,13 +1,18 @@
 from io import BytesIO
-from flask import Flask, send_file, abort
+from flask import Flask, send_file, abort, jsonify
 from webcam import CV2VideoCapture
 import threading
+from sensor import Sensor 
 
 app = Flask(__name__)
 
 cv2capture = CV2VideoCapture()
 cv2capture.activateCamera()
+
+sensor = Sensor()
+
 threading.Thread(target = cv2capture.startStream, daemon=True,).start()
+threading.Thread(target = sensor.start_sensor, daemon=True,).start()
 
 @app.route("/")
 def home():
@@ -15,7 +20,7 @@ def home():
 
 @app.route("/status")
 def status():
-    return "ready"
+    return sensor.status
 
 @app.route('/image')
 def image():
