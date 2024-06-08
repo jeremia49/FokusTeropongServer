@@ -6,6 +6,7 @@ class Sensor():
 
     def __init__(self):  
         self.status = "OK"      
+        self.shouldBuzzerOn = False
         self.tilt1_pin = 17
         self.tilt2_pin = 27
 
@@ -28,6 +29,14 @@ class Sensor():
         GPIO.setup(self.addpower2_pin, GPIO.OUT)
         GPIO.output(self.addpower_pin, GPIO.HIGH)
         GPIO.output(self.addpower2_pin, GPIO.HIGH)
+    
+    def alertDeteksiGagal(self):
+        if(not self.shouldBuzzerOn):
+            return
+        GPIO.output(self.buzzer_pin, GPIO.HIGH)
+        time.sleep(3)
+        GPIO.output(self.buzzer_pin, GPIO.LOW)
+
 
     def start_sensor(self):
         try:
@@ -51,7 +60,8 @@ class Sensor():
                     hidupkanbuzzer = True
                 
                 if(hidupkanbuzzer):
-                    GPIO.output(self.buzzer_pin, GPIO.HIGH)
+                    if(self.shouldBuzzerOn):
+                        GPIO.output(self.buzzer_pin, GPIO.HIGH)
                 else:
                     self.status = "OK"
                     print("Sesuai")

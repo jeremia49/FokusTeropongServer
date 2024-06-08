@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import Flask, send_file, abort, jsonify
+from flask import Flask, send_file, abort, jsonify, request
 from webcam import CV2VideoCapture
 import threading
 from sensor import Sensor 
@@ -11,8 +11,11 @@ cv2capture.activateCamera()
 
 sensor = Sensor()
 
-threading.Thread(target = cv2capture.startStream, daemon=True,).start()
 threading.Thread(target = sensor.start_sensor, daemon=True,).start()
+threading.Thread(target = cv2capture.startStream, daemon=True, args = (sensor.alertDeteksiGagal,)).start()
+
+isInferenceStarted = False
+jenisKain = None
 
 @app.route("/")
 def home():
@@ -20,7 +23,30 @@ def home():
 
 @app.route("/status")
 def status():
-    return sensor.status
+    return jsonify({"status":isInferenceStarted})
+
+@app.route("/statusDeteksi")
+def detectionStatus():
+    return jsonify({"status":cv2capture.currentDetectionStatus})
+
+@app.route("/start")
+def setStart():
+    sensor.shouldBuzzerOn = True
+    jenisKain = request.args.get('jeniskain')
+    isInferenceStarted = True
+    return jsonify({"status":"ok"})
+
+@app.route("/stop")
+def setStop():
+    sensor.shouldBuzzerOn = False
+    isInferenceStarted = False
+    return jsonify({"status":"ok"})
+
+
+@app.route("/jenisKain")
+def getJenisKain():
+    return jsonify({"status":"ok", "data":jenisKain})
+
 
 @app.route('/image')
 def image():
