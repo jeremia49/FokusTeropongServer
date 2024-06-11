@@ -23,14 +23,39 @@ def home():
 
 @app.route("/status")
 def status():
-    return jsonify({"status":isInferenceStarted})
+    global isInferenceStarted
+    if(sensor.status != "OK"):
+        return jsonify({"status":str(sensor.status)})
+    
+    if(isInferenceStarted):
+        if(cv2capture.currentDetectionStatus):
+            return jsonify({"status":"Gambar Benar!","data":str({
+                "density": cv2capture.density,
+                "reconstructionerr": cv2capture.reconsturctionerr,
+            })})
+        else:
+            return jsonify({"status":"Gambar Salah!","data":str({
+                "density": cv2capture.density,
+                "reconstructionerr": cv2capture.reconsturctionerr,
+            })})
+    
+    return jsonify({"status":"Alat Ready"})
+    
 
 @app.route("/statusDeteksi")
 def detectionStatus():
-    return jsonify({"status":cv2capture.currentDetectionStatus})
+    return jsonify({"status":str(cv2capture.currentDetectionStatus)})
+
+@app.route("/statusSensor")
+def sensorStatus():
+    return jsonify({"status":str(sensor.status)})
 
 @app.route("/start")
 def setStart():
+    global jenisKain
+    global isInferenceStarted
+    
+    cv2capture.shouldrunInference = True
     sensor.shouldBuzzerOn = True
     jenisKain = request.args.get('jeniskain')
     isInferenceStarted = True
@@ -38,6 +63,9 @@ def setStart():
 
 @app.route("/stop")
 def setStop():
+    global isInferenceStarted
+
+    cv2capture.shouldrunInference = False
     sensor.shouldBuzzerOn = False
     isInferenceStarted = False
     return jsonify({"status":"ok"})
@@ -45,6 +73,7 @@ def setStop():
 
 @app.route("/jenisKain")
 def getJenisKain():
+    global jenisKain
     return jsonify({"status":"ok", "data":jenisKain})
 
 

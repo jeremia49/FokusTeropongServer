@@ -29,13 +29,16 @@ class Sensor():
         GPIO.setup(self.addpower2_pin, GPIO.OUT)
         GPIO.output(self.addpower_pin, GPIO.HIGH)
         GPIO.output(self.addpower2_pin, GPIO.HIGH)
+
+        GPIO.output(self.buzzer_pin, GPIO.LOW)
     
     def alertDeteksiGagal(self):
         if(not self.shouldBuzzerOn):
             return
         GPIO.output(self.buzzer_pin, GPIO.HIGH)
-        time.sleep(3)
+        time.sleep(1)
         GPIO.output(self.buzzer_pin, GPIO.LOW)
+        time.sleep(2)
 
 
     def start_sensor(self):
@@ -60,14 +63,17 @@ class Sensor():
                     hidupkanbuzzer = True
                 
                 if(hidupkanbuzzer):
-                    if(self.shouldBuzzerOn):
-                        GPIO.output(self.buzzer_pin, GPIO.HIGH)
+                    # if(self.shouldBuzzerOn):
+                    GPIO.output(self.buzzer_pin, GPIO.HIGH)
+                    time.sleep(2)
+                    GPIO.output(self.buzzer_pin, GPIO.LOW)
+                    time.sleep(2)
                 else:
                     self.status = "OK"
                     print("Sesuai")
                     GPIO.output(self.buzzer_pin, GPIO.LOW)
                 
-                time.sleep(0.5)
+                time.sleep(1)
         except Exception as e:
             print(e)
         finally:
